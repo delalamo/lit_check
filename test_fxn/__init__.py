@@ -12,7 +12,7 @@ app = func.FunctionApp()
 @app.timer_trigger(
     schedule="0 * * * * *", arg_name="myTimer", run_on_startup=False, use_monitor=False
 )
-def timer_trigger2(myTimer: func.TimerRequest) -> None:
+def main(myTimer: func.TimerRequest) -> None:
     for s in ["CONNECTION_STRING", "MY_EMAIL", "SENDER_EMAIL"]:
         logging.info(s, os.environ[s])
 
