@@ -1,8 +1,28 @@
+from copy import deepcopy
 import logging
 import azure.functions as func
 from datetime import datetime
 
+from azure.communication.email import EmailClient
+import os
+
 app = func.FunctionApp()
+
+
+connection_string = os.environ["CONNECTION_STRING"]
+email_client = EmailClient.from_connection_string(connection_string)
+
+message = {
+    "content": {
+        "subject": "This is the subject",
+        "plainText": "This is the body",
+        "html": "<html><h1>This is the body</h1></html>",
+    },
+    "recipients": {
+        "to": [{"address": os.environ["MY_EMAIL"], "displayName": "Diego del Alamo"}]
+    },
+    "senderAddress": os.environ["SENDER_EMAIL"],
+}
 
 
 @app.timer_trigger(
@@ -16,4 +36,9 @@ def timer_trigger2(myTimer: func.TimerRequest) -> None:
     # current_execution = datetime.now(datetime.timezone.utc).isoformat()  # Use UTC time
     current_execution = datetime.utcnow().isoformat()  # Use UTC time
     logging.info("Timer trigger executed at: %s", current_execution)
-    logging.info("Python timer trigger function executed.")
+    local_message = deepcopy(message)
+    local_message["content"]["html"] = f"<html><h1>{current_execution}</h1></html>"
+    poller = email_client.begin_send(local_message)
+    logging.info("Email sent")
+    result = poller.result()
+    logging.info(result)
