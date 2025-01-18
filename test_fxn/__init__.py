@@ -9,26 +9,30 @@ import os
 app = func.FunctionApp()
 
 
-connection_string = os.environ["CONNECTION_STRING"]
-email_client = EmailClient.from_connection_string(connection_string)
-
-message = {
-    "content": {
-        "subject": "This is the subject",
-        "plainText": "This is the body",
-        "html": "<html><h1>This is the body</h1></html>",
-    },
-    "recipients": {
-        "to": [{"address": os.environ["MY_EMAIL"], "displayName": "Diego del Alamo"}]
-    },
-    "senderAddress": os.environ["SENDER_EMAIL"],
-}
-
-
 @app.timer_trigger(
     schedule="0 * * * * *", arg_name="myTimer", run_on_startup=False, use_monitor=False
 )
 def timer_trigger2(myTimer: func.TimerRequest) -> None:
+    for s in ["CONNECTION_STRING", "MY_EMAIL", "SENDER_EMAIL"]:
+        logging.info(s, os.environ[s])
+
+    connection_string = os.environ["CONNECTION_STRING"]
+    email_client = EmailClient.from_connection_string(connection_string)
+
+    message = {
+        "content": {
+            "subject": "This is the subject",
+            "plainText": "This is the body",
+            "html": "<html><h1>This is the body</h1></html>",
+        },
+        "recipients": {
+            "to": [
+                {"address": os.environ["MY_EMAIL"], "displayName": "Diego del Alamo"}
+            ]
+        },
+        "senderAddress": os.environ["SENDER_EMAIL"],
+    }
+
     if myTimer.past_due:
         logging.info("The timer is past due!")
 
