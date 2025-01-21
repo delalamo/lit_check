@@ -13,5 +13,8 @@ def main(mytimer: func.TimerRequest) -> None:
     utc_timestamp = datetime.datetime.utcnow().isoformat()
     logging.info("Timer trigger executed at: %s", utc_timestamp)
 
+    if mytimer.past_due:
+        logging.info("The timer is past due!")
+
     # Your script logic here
     logging.info("Daily script executed successfully.")
