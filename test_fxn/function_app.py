@@ -6,6 +6,9 @@ import logging
 app = func.FunctionApp()
 
 
+@app.timer_trigger(
+    schedule="0 * * * * *", arg_name="myTimer", run_on_startup=False, use_monitor=False
+)
 def main(mytimer: func.TimerRequest) -> None:
     utc_timestamp = datetime.datetime.utcnow().isoformat()
     logging.info("Timer trigger executed at: %s", utc_timestamp)
